@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"     
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:p="http://www.springframework.org/schema/p"     
+		xmlns:context="http://www.springframework.org/schema/context"     
+		xmlns:tx="http://www.springframework.org/schema/tx"     
+		xmlns:aop="http://www.springframework.org/schema/aop"     
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd   
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd   
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- 启用SpringMVC 注解 -->
+	<context:annotation-config/>
+	
+	<!-- 设置使用注解的类所在的jar包 -->
+	<context:component-scan base-package="*"/>
+
+	<!-- 读取配置文件 -->
+	<bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<property name="locations" value="classpath:config/jdbc.properties"></property>
+	</bean>
+	
+	<!-- 使用c3p0连接池作为数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		
+		<!-- 数据库连接配置 -->
+		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		
+		<!-- 数据连接池配置 -->
+		<property name="maxPoolSize" value="30"/>
+		<property name="minPoolSize" value="5"/>
+		<property name="maxStatements" value="50"/>
+		<property name="maxConnectionAge" value="1800"/>
+	
+	</bean>
+	
+	<!-- 定义sessionFactory -->
+	<bean id="sessionFactory"
+	 class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+	 	
+	 	<!-- 注入数据源 -->
+	 	<property name="dataSource" ref="dataSource"/>
+	 	
+	 	<!-- 注入注解的类 -->
+	 	<property name="annotatedClasses">
+	 		<list>
+	 			<value>org.niit.entity.User</value>
+	 		</list>
+	 	</property>
+	 	
+	 	<!-- 后加入的 -->
+		<!-- 注入映射文件 
+		<property name="mappingResources">
+			<list>
+				<value>org/niit/entity/User.hbm.xml</value>
+			</list>
+		</property>
+		 -->
+	 	
+	 	<!-- 注入hibernate参数 -->
+	 	<property name="hibernateProperties">
+	 		<props>
+	 			<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+	 			<prop key="hibernate.current_session_context_class">thread</prop>
+	 			<prop key="hibernate.show_sql">true</prop>
+	 		</props>
+	 	</property>
+	 
+	 
+	 </bean>
+	
+	
+
+</beans>
